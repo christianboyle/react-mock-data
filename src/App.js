@@ -8,14 +8,44 @@ const getDeveloperText = (isDeveloper) =>
 const App = () => {
   const [users, setUsers] = React.useState(null);
 
-  React.useEffect(() => {
-    const doGetUsers = async () => {
+  const doGetUsers = React.useCallback(async () => {
+    try {
       const result = await getUsers();
       setUsers(result);
-    };
-
-    doGetUsers();
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
+
+  React.useEffect(() => {
+    doGetUsers();
+  }, [doGetUsers]);
+
+  const refetchUsers = async () => {
+    await doGetUsers();
+  };
+
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+
+  const handleChangeFirstName = (event) => {
+    setFirstName(event.target.value);
+  };
+
+  const handleChangeLastName = (event) => {
+    setLastName(event.target.value);
+  };
+
+  const handleCreate = async (event) => {
+    event.preventDefault();
+
+    try {
+      await createUser({ firstName, lastName, isDeveloper: false });
+      await refetchUsers();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (!users) {
     return null;
@@ -34,6 +64,24 @@ const App = () => {
           );
         })}
       </ul>
+
+      <hr />
+
+      <span>Create User:</span>
+
+      <form onSubmit={handleCreate}>
+        <label>
+          First Name:
+          <input type="input" onChange={handleChangeFirstName} />
+        </label>
+
+        <label>
+          Last Name:
+          <input type="input" onChange={handleChangeLastName} />
+        </label>
+
+        <button type="submit">Create</button>
+      </form>
     </div>
   );
 };
