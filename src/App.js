@@ -59,6 +59,15 @@ const App = () => {
     }
   }
 
+  const handleRemove = async (id) => {
+    try {
+      await deleteUser(id)
+      await refetchUsers()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   if (!users) {
     return null
   }
@@ -74,6 +83,9 @@ const App = () => {
               {user.firstName} {user.lastName} {developerText}
               <button type='button' onClick={() => handleEdit(user.id)}>
                 Toggle Developer (Update)
+              </button>
+              <button type='button' onClick={() => handleRemove(user.id)}>
+                Remove User (Delete)
               </button>
             </li>
           )
